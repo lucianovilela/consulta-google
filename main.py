@@ -5,6 +5,7 @@ from flask_cors import CORS
 from logzero import logger
 from util import pesquisa_google
 from markupsafe import escape
+import os
 
 def create_app(config=None):
   logger.debug("create flask")
@@ -45,7 +46,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-p", "--port", action="store", default="5000")
     args = parser.parse_args()
-    port = int(args.port)
+    port = int(os.getenv("PORT", args.port))
     app = create_app()
     app.run(host="0.0.0.0", port=port)
 
