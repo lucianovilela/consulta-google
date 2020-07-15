@@ -5,7 +5,7 @@ def getPhotos(nome):
                 os.environ.get("developerKey"))
     res = service.cse().list(
         q=nome,
-        cx=os.environ.get(cx),
+        cx=os.environ.get("cx"),
         searchType='image',
         num=3,
         imgType='photo',
