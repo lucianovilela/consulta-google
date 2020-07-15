@@ -1,7 +1,9 @@
 import requests
 import re
 from datetime import datetime
-import wikipedia
+from util.photo_google import getPhotos
+from logzero import logger
+
 
 s=[{'signo':'Aquário','meses':[1,2], 'dias':[20,18]},
 {'signo':'Peixes','meses':[2,3], 'dias':[19,20]},
@@ -24,23 +26,30 @@ def getSigno(d):
       return o
       break
 
-
 def getComplemento(nome):
-  s=wikipedia.search(nome)
   try:
-    p=wikipedia.page(s[0])
-    if p.images[0]:
-      return {'nomewiki': s[0], 'imagem':p.images}
+    return {'nomewiki': s[0], 'imagem':getPhotos(nome)}
   except:
     return {'exception':'nao encontrado'}
 
+# def getComplemento(nome):
+#   s=wikipedia.search(nome)
+#   try:
+#     p=wikipedia.page(s[0])
+#     if p.images[0]:
+#       return {'nomewiki': s[0], 'imagem':p.images}
+#   except:
+#     return {'exception':'nao encontrado'}
+
 def getDateNascimento(nome):
   req=requests.get(f"https://www.google.com/search?q={nome}")
+#  logger.info(req.text)
   txt =  re.findall(r"([jfajsondm]\w+\s\d+,\s\d+)[\s,]+", req.text, re.IGNORECASE)
-
-  #print(bs.prettify())
-  #print(txt[0])
-  if txt[0]:
+  if txt:
     dt=datetime.strptime( txt[0], "%B %d, %Y")
+  else:
+    txt =  re.findall(r"(\d{1,2}\sde\s[jfmajsond]\w+\sde\s\d{4})", req.text, re.IGNORECASE)
+    if txt[0]:
+      dt=datetime.strptime( txt[0], "%d de %B de %Y")
 
   return dt

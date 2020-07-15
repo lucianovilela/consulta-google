@@ -3,7 +3,7 @@ import argparse
 from flask import Flask, jsonify
 from flask_cors import CORS
 from logzero import logger
-from util import pesquisa_google
+from util import pesquisa
 from markupsafe import escape
 import os
 
@@ -23,10 +23,10 @@ def create_app(config=None):
   def getCeleb(name):
       name_=escape(name)
       try:
-        dt=pesquisa_google.getDateNascimento(name_)
+        dt=pesquisa.getDateNascimento(name_)
         if dt:
-          signo = pesquisa_google.getSigno(dt)
-          complemento=pesquisa_google.getComplemento(name_)
+          signo = pesquisa.getSigno(dt)
+          complemento=pesquisa.getComplemento(name_)
         return jsonify({
           "name":name,
           "dataNascimento":dt,
