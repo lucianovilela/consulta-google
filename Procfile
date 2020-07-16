@@ -1,1 +1,1 @@
-web: python main.py
+web: cd server;npm start
