@@ -1,65 +1,20 @@
 import React, { useState } from "react";
 import "./styles.css";
 import moment from "moment";
+import Container from 'react-bootstrap/Container';
+import Card from 'react-bootstrap/Card';
+import Button from 'react-bootstrap/Button';
 
-const URL = "https://signos-celebridades.herokuapp.com/celeb/";
-
-const Carousel = ({ images }) => {
-  return (
-    <div>
-      <div
-        id="carouselExampleIndicators"
-        className="carousel slide"
-        data-ride="carousel"
-      >
-        <ol className="carousel-indicators">
-          <li
-            data-target="#carouselExampleIndicators"
-            data-slide-to="0"
-            className="active"
-          />
-          <li data-target="#carouselExampleIndicators" data-slide-to="1" />
-          <li data-target="#carouselExampleIndicators" data-slide-to="2" />
-        </ol>
-        <div className="carousel-inner">
-          {images.map((img, i) => (
-            <div className={i === 0 ? "carousel-item active" : "carousel-item"}>
-              <img src={img} className="d-block w-100" alt={img} />
-            </div>
-          ))}
-        </div>
-        <a
-          className="carousel-control-prev"
-          href="#carouselExampleIndicators"
-          role="button"
-          data-slide="prev"
-        >
-          <span className="carousel-control-prev-icon" aria-hidden="true" />
-          <span claclassNamess="sr-only">Previous</span>
-        </a>
-        <a
-          className="carousel-control-next"
-          href="#carouselExampleIndicators"
-          role="button"
-          data-slide="next"
-        >
-          <span className="carousel-control-next-icon" aria-hidden="true" />
-          <span className="sr-only">Next</span>
-        </a>
-      </div>
-    </div>
-  );
-};
+const URL = "http://localhost:3000/celeb/";
 
 const Pessoa = ({ pessoa }) => {
   return (
     <>
-      {pessoa.complemento.imagem ? (
-        <Carousel images={pessoa.complemento.imagem} />
-      ) : (
-        <p>&nbsp;</p>
-      )}{" "}
-      <div className="card">
+      
+      <Card>
+        <div className="card-head">
+          <img src={pessoa.complemento.imagem.items[0].image.thumbnailLink} />
+        </div>
         <div className="card-body">
           <p>{pessoa.complemento?.nomewiki}</p>
           <div>
@@ -68,7 +23,7 @@ const Pessoa = ({ pessoa }) => {
           </div>
           <p> {pessoa.signo.signo} </p>
         </div>
-      </div>
+      </Card>
     </>
   );
 };
@@ -97,9 +52,9 @@ const Search = ({ setData }) => {
           setValor(event.target.value);
         }}
       />
-      <button className="btn btn-default" onClick={handleInput}>
+      <Button variant="primary" onClick={handleInput}>
         consulta
-      </button>
+      </Button>
     </>
   );
 };
@@ -108,9 +63,10 @@ export default function App() {
   const [data, setData] = useState();
 
   return (
-    <div className="App">
+    <Container>
       <Search setData={setData} />
       <ListName pessoas={data} />
-    </div>
+    </Container>
+
   );
 }

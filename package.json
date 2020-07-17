@@ -1,0 +1,19 @@
+{
+  "name": "consulta-google",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lucianovilela/consulta-google.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lucianovilela/consulta-google/issues"
+  },
+  "homepage": "https://github.com/lucianovilela/consulta-google#readme"
+}
