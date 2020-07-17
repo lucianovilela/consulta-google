@@ -5,7 +5,7 @@ import Container from 'react-bootstrap/Container';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 
-const URL = "http://localhost:3000/celeb/";
+const URL = "/celeb/";
 
 const Pessoa = ({ pessoa }) => {
   return (
