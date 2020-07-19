@@ -1,11 +1,36 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
+<html lang="pt-br">
+  <%- include header %>
   <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
+    <%- include nav %>
+    <div class="section no-pad-bot" id="index-banner">
+      <div class="container">
+        <div class="row">
+          <form class="col s12" action="signo">
+            <div class="row">
+              <div class="input-field col s6">
+                <input placeholder="Celebridade" id="first_name" type="text" name="nome"/>
+                <label for="first_name">Celebridade</label>
+              </div>
+            </div>
+            <div class="row">
+              <button class="btn waves-effect waves-light" type="submit" name="action">Submit
+                <i class="material-icons right">send</i>
+              </button>
+            </div>
+          </form>
+          <% if(result){ %>
+          <div class="container center">
+            <img class="responsive-img" src="<%= result.complemento.imagem.items[0].link %>"/>
+            <p><%= result.complemento.nomewiki %></p>
+            <p><strong>Data Nascimento </strong><%= result.dataNascimento %></p>
+            <p><strong>Signo </strong><%= result.signo.signo %></p>
+
+          </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+    <%- include footer %>
   </body>
 </html>
