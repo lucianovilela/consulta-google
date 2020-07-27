@@ -11,21 +11,25 @@
               <div class="input-field col s6">
                 <input placeholder="Celebridade" id="first_name" type="text" name="nome"/>
                 <label for="first_name">Celebridade</label>
-              </div>
+                <button class="btn waves-effect waves-light" type="submit" name="action">Submit
+                   <i class="material-icons right">send</i>
+                </button>
             </div>
-            <div class="row">
-              <button class="btn waves-effect waves-light" type="submit" name="action">Submit
-                <i class="material-icons right">send</i>
-              </button>
-            </div>
+          </div>
           </form>
+        </div>
+      </div >
           <% if(result){ %>
-          <div class="container center">
-            <img class="responsive-img" src="<%= result.complemento.imagem.items[0].link %>"/>
-            <p><%= result.complemento.nomewiki %></p>
-            <p><strong>Data Nascimento </strong><%= result.dataNascimento %></p>
-            <p><strong>Signo </strong><%= result.signo.signo %></p>
+      <div class="card center">
+          <div class="card-title">
 
+            <img class="responsive-img" src="<%= result.imagem %>" height="20%" width="20%"/>
+          </div>
+          <div class="card-content">
+            <p><%= result.nome %></p>
+            <p><strong>Data Nascimento </strong><%= dn %></p>
+            <p><strong>Signo </strong><%= result.signo %></p>
+          </div>
           </div>
           <% } %>
         </div>

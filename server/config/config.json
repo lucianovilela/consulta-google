@@ -1,0 +1,27 @@
+{
+
+  "development": {
+    "username": "rqjbsaij",
+    "password": "aC1gqM1NUQu7KMIWQZ-TmXMVBi4hr7vz",
+    "database": "rqjbsaij",
+    "port":5432,
+    "host": "motty.db.elephantsql.com",
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "rqjbsaij",
+    "password": "aC1gqM1NUQu7KMIWQZ-TmXMVBi4hr7vz",
+    "database": "rqjbsaij",
+    "port":5432,
+    "host": "motty.db.elephantsql.com",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "rqjbsaij",
+    "password": "aC1gqM1NUQu7KMIWQZ-TmXMVBi4hr7vz",
+    "database": "rqjbsaij",
+    "port":5432,
+    "host": "motty.db.elephantsql.com",
+    "dialect": "postgres"
+  }
+}

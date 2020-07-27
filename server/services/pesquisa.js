@@ -1,11 +1,9 @@
 const axios = require("axios").default;
-const {google} = require('googleapis');
-const customsearch = google.customsearch('v1');
-const moment = require('moment');
+const { google } = require("googleapis");
+const customsearch = google.customsearch("v1");
+const moment = require("moment");
 
-
-
-
+const db = require("../models/index");
 const SIGNOS = [
   { signo: "Aquário", meses: [1, 2], dias: [20, 18] },
   { signo: "Peixes", meses: [2, 3], dias: [19, 20] },
@@ -22,9 +20,9 @@ const SIGNOS = [
   { signo: "Capricórnio", meses: [1, 1], dias: [1, 19] },
 ];
 
-const getSigno = (d) => {
+const getSigno = (dataNascimento) => {
   for (const o of SIGNOS) {
-    dia = d.month() * 100 + d.day();
+    dia = (dataNascimento.month() + 1) * 100 + dataNascimento.date();
     if (
       dia >= o["meses"][0] * 100 + o["dias"][0] &&
       dia <= o["meses"][1] * 100 + o["dias"][1]
@@ -33,65 +31,71 @@ const getSigno = (d) => {
     }
   }
 };
-const getComplemento =async  (nome) => {
-  try {
-    return { nomewiki: nome, imagem: await getPhotos(nome) };
-  } catch (e) {
-    console.error(e);
-    return { exception: "nao encontrado" };
-  }
-};
+
 const getDateNascimento = async (nome) => {
   return await axios({
     url: `https://www.google.com/search?q=${nome}`,
     method: "GET",
   }).then((res) => {
     const html = res.data;
-    let txt =html.match(/([jfajsondm]\w+\s\d+,\s\d+)[\s,]+/gmi);
-    if (!txt) {
-      txt = html.match(/(\d{1,2}\sde\s[jfmajsond]\w+\sde\s\d{4})/gmi);
-    }
+    let txt = html.match(/([jfajsondm]\w+\s\d+,\s\d+)[\s,]+/gim);
     if (txt) {
-      const dt = moment(txt[0],"DD  MMMM  YYYY", "pt-br");
-      return dt;
+      return moment(txt[0], "MMMM  DD  YYYY", "en");
+    } else {
+      txt = html.match(/(\d{1,2}\sde\s[jfmajsond]\w+\sde\s\d{4})/gim);
+      if (txt) {
+        return moment(txt[0], "DD  MMMM  YYYY", "pt-br");
+      }
     }
+    return undefined;
   });
 };
 
+const getPhotos = async (nome) => {
+  const obj = await customsearch.cse.list({
+    q: nome,
+    cx: process.env.cx,
+    searchType: "image",
+    num: 1,
+    imgType: "photo",
+    fileType: "png",
+    safe: "off",
+    auth: process.env.developerKey,
+  });
 
-const  getPhotos=async (nome)=>{
-  
-  const res = await customsearch.cse.list({
-      q:nome,
-      cx:process.env.cx,
-      searchType:'image',
-      num:1,
-      imgType:'photo',
-      fileType:'png',
-      safe:'off',
-      auth:process.env.developerKey
-      });
-      return res.data;
+  return obj.data.items[0];
+};
 
-}        
+const sanitize = (str) => {
+  return str
+    .trim()
+    .replace(/\s+/gim, " ")
+    .replace(/[^\w\s\d]/gim, "");
+};
+const pesquisa = async (_nome) => {
+  const nome = sanitize(_nome);
 
-const sanitize= (str)=>{
-  return escape(str.trim().replace(/\s+/gmi, " "));
-}
-const pesquisa=async (_nome)=>{
-  const nome=sanitize(_nome);
-  console.debug(nome);
-  const dt = await getDateNascimento(nome);
-  let signo={}
-  if(dt){
-     signo = getSigno(dt);
+  let pesquisa = await db.consulta.findOne({ where: { nome: nome } });
+  if (pesquisa) {
+    return pesquisa;
   }
-  const complemento = await getComplemento(nome);
-  //const complemento={};
-  return ({nome:nome, 
-    signo:signo,
-    dataNascimento:dt, 
-  complemento:complemento});
-}
+
+  const dataNascimento = await getDateNascimento(nome);
+  try {
+    var signo = undefined;
+    if (dataNascimento) signo = await getSigno(dataNascimento);
+
+    const photo = await getPhotos(nome);
+    pesquisa = await db.consulta.create({
+      nome: nome,
+      signo: signo.signo,
+      dataNascimento: dataNascimento,
+      imagem: photo.link,
+    });
+    return pesquisa;
+  } catch (error) {
+    return { error: error.message };
+  }
+};
 
 module.exports = pesquisa;

@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var moment = require('moment');
 const pesquisa = require('../services/pesquisa'); 
 
 /* GET home page. */
@@ -12,7 +13,16 @@ router.get('/signo', async function(req, res, next) {
   if(req.query.nome){
      result= await pesquisa(req.query.nome);
   }
-  res.render('signo', { title: 'Signos', result:result });
+  if(result){
+    const dn =moment(result.dataNascimento).format("DD/MM/YYYY");
+    res.render('signo', { title: 'Signos', dn, result });
+
+  }
+  else{
+    res.render('signo', { title: 'Signos', result});
+
+
+  }
 });
 
 router.get('/celeb/:nome',  async function(req, res, next) {
