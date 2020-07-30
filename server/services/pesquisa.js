@@ -34,7 +34,8 @@ const getSigno = (dataNascimento) => {
 
 const getDateNascimento = async (nome) => {
   return await axios({
-    url: `https://www.google.com/search?q=${nome}`,
+    
+    url: `https://www.google.com/search?q=${nome}&rlz=1C1GCEU_pt-BRBR894BR894&${nome}&ie=UTF-8`,
     method: "GET",
   }).then((res) => {
     const html = res.data;
@@ -52,18 +53,24 @@ const getDateNascimento = async (nome) => {
 };
 
 const getPhotos = async (nome) => {
-  const obj = await customsearch.cse.list({
-    q: nome,
-    cx: process.env.cx,
-    searchType: "image",
-    num: 1,
-    imgType: "photo",
-    fileType: "png",
-    safe: "off",
-    auth: process.env.developerKey,
-  });
+  try {
+    
+      const obj = await customsearch.cse.list({
+        q: nome,
+        cx: process.env.cx,
+        searchType: "image",
+        num: 1,
+        imgType: "photo",
+        fileType: "png",
+        safe: "off",
+        auth: process.env.developerKey,
+      });
 
-  return obj.data.items[0];
+      return obj.data.items[0];
+    } catch (error) {
+      return {link:"https://images.unsplash.com/photo-1519400197429-404ae1a1e184?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1586&q=80"  }    
+    }
+
 };
 
 const sanitize = (str) => {
@@ -83,9 +90,11 @@ const pesquisa = async (_nome) => {
   const dataNascimento = await getDateNascimento(nome);
   try {
     var signo = undefined;
-    if (dataNascimento) signo = await getSigno(dataNascimento);
-
-    const photo = await getPhotos(nome);
+    var photo = undefined;
+    if (dataNascimento) {
+      signo = await getSigno(dataNascimento);
+      photo = await getPhotos(nome);
+    }
     pesquisa = await db.consulta.create({
       nome: nome,
       signo: signo.signo,
