@@ -35,20 +35,30 @@ const getSigno = (dataNascimento) => {
 const getDateNascimento = async (nome) => {
   return await axios({
     
-    url: `https://www.google.com/search?q=${nome}&rlz=1C1GCEU_pt-BRBR894BR894&${nome}&ie=UTF-8`,
+    url: `https://www.google.com/search?q=${nome}&rlz=1C1GCEU_pt-BRBR894BR894&ie=UTF-8`,
     method: "GET",
   }).then((res) => {
     const html = res.data;
+
     let txt = html.match(/([jfajsondm]\w+\s\d+,\s\d+)[\s,]+/gim);
+    var dataNascimento=undefined;
+    var nomeGoogle = undefined;
+
     if (txt) {
-      return moment(txt[0], "MMMM DD YYYY", "en");
+      dataNascimento= moment(txt[0], "MMMM DD YYYY", "en");
     } else {
       txt = html.match(/(\d{1,2}\sde\s[jfmajsond]\w+\sde\s\d{4})/gim);
       if (txt) {
-        return moment(txt[0], "DD MMMM YYYY", "pt-br");
+        dataNascimento= moment(txt[0], "DD MMMM YYYY", "pt-br");
       }
     }
-    return undefined;
+
+    txt = html.match(/data\-attrid\=\"title\".+<span>([\w\s]+)<\/span>/gim);
+    if(txt){
+      nomeGoogle=txt[0];
+    }
+
+    return {dataNascimento, nomeGoogle};
   });
 };
 
@@ -87,16 +97,19 @@ const pesquisa = async (_nome) => {
     return pesquisa;
   }
 
-  const dataNascimento = await getDateNascimento(nome);
+  let {dataNascimento, nomeGoogle} = await getDateNascimento(nome);
   try {
     var signo = undefined;
     var photo = undefined;
+    if(!nomeGoogle){
+      nomeGoogle = nome;
+    }
     if (dataNascimento) {
       signo = await getSigno(dataNascimento);
-      photo = await getPhotos(nome);
+      photo = await getPhotos(nomeGoogle);
     }
     pesquisa = await db.consulta.create({
-      nome: nome,
+      nome: nomeGoogle,
       signo: signo.signo,
       dataNascimento: dataNascimento,
       imagem: photo.link,
