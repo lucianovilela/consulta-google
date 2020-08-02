@@ -41,11 +41,11 @@ const getDateNascimento = async (nome) => {
     const html = res.data;
     let txt = html.match(/([jfajsondm]\w+\s\d+,\s\d+)[\s,]+/gim);
     if (txt) {
-      return moment(txt[0], "MMMM  DD  YYYY", "en");
+      return moment(txt[0], "MMMM DD YYYY", "en");
     } else {
       txt = html.match(/(\d{1,2}\sde\s[jfmajsond]\w+\sde\s\d{4})/gim);
       if (txt) {
-        return moment(txt[0], "DD  MMMM  YYYY", "pt-br");
+        return moment(txt[0], "DD MMMM YYYY", "pt-br");
       }
     }
     return undefined;
