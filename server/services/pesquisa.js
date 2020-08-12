@@ -128,7 +128,9 @@ const sanitize = (obj) => {
     nome:obj.nome
     .trim()
     .replace(/\s+/gim, " ")
-    .replace(/[^\w\s\d]/gim, "")};
+    .replace(/[^\w\s\d]/gim, "")
+    .toLowerCase()
+  };
 };
 const pesquisa = async (_nome) => {
   const resultado = {
