@@ -9,6 +9,7 @@ require('dotenv').config();
 const db = require('./models/index');
 //db.consulta.drop();
 db.consulta.sync({alter:true});
+//db.sinonimo.sync({alter:true});
 
 var indexRouter = require('./routes/index');
 

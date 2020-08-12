@@ -2,6 +2,7 @@ const axios = require("axios").default;
 const { google } = require("googleapis");
 const customsearch = google.customsearch("v1");
 const moment = require("moment");
+const  pretty  = require("pretty");
 
 const db = require("../models/index");
 const SIGNOS = [
@@ -32,14 +33,52 @@ const getSigno = (dataNascimento) => {
   }
 };
 
-const getDateNascimento = async (nome) => {
+
+
+const getDateNascimentoBing = async (nome) => {
+  return await axios({url:`https://www.bing.com/search?q=${nome}&form=QBLH&sp=-1&pq=${nome}&sc=6-8&qs=n`, 
+    "headers": {
+      "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+      "accept-language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+      "cache-control": "no-cache",
+      "pragma": "no-cache",
+      "sec-fetch-dest": "document",
+      "sec-fetch-mode": "navigate",
+      "sec-fetch-site": "same-origin",
+      "sec-fetch-user": "?1",
+      "upgrade-insecure-requests": "1",
+    },
+    "referrerPolicy": "no-referrer-when-downgrade",
+    "body": null,
+    "method": "GET",
+    "mode": "cors"
+  }).then((res) => {
+    const html = res.data;
+    console.debug(pretty(html));
+
+    var dataNascimento=undefined;
+    var nomeGoogle = undefined;
+    txt = html.match(/Nasceu:<\/span>\s(\d{1,2}\sde\s[jfmajsond]\w+\sde\s\d{4})/gim);
+    if (txt) {
+      dataNascimento= moment(txt[0], "DD MMM YYYY", "pt-br");
+    }
+
+    txt = html.match(/<h2\sclass=\"\sb_entityTitle\">([\w\s]+)<\/h2>/gim);
+    if(txt){
+      nomeGoogle=txt[0];
+    }
+
+    return {dataNascimento, nomeGoogle};
+  });
+};
+
+
+const getDateNascimentoGoogle = async (nome) => {
   return await axios({
     
     url: `https://www.google.com/search?q=${nome}&rlz=1C1GCEU_pt-BRBR894BR894&ie=UTF-8`,
     method: "GET",
   }).then((res) => {
-    const html = res.data;
-
     let txt = html.match(/([jfajsondm]\w+\s\d+,\s\d+)[\s,]+/gim);
     var dataNascimento=undefined;
     var nomeGoogle = undefined;
@@ -83,21 +122,30 @@ const getPhotos = async (nome) => {
 
 };
 
-const sanitize = (str) => {
-  return str
+const sanitize = (obj) => {
+  return {
+    ...obj, 
+    nome:obj.nome
     .trim()
     .replace(/\s+/gim, " ")
-    .replace(/[^\w\s\d]/gim, "");
+    .replace(/[^\w\s\d]/gim, "")};
 };
 const pesquisa = async (_nome) => {
-  const nome = sanitize(_nome);
+  const resultado = {
+    nome:_nome,
+    signo:undefined,
+    dataNascimento:undefined,
+    imagem:undefined,
+  };
+
+  const nome = sanitize(resultado).nome;
 
   let pesquisa = await db.consulta.findOne({ where: { nome: nome } });
   if (pesquisa) {
     return pesquisa;
   }
 
-  let {dataNascimento, nomeGoogle} = await getDateNascimento(nome);
+  let {dataNascimento, nomeGoogle} = await getDateNascimentoGoogle(nome);
   try {
     var signo = undefined;
     var photo = undefined;

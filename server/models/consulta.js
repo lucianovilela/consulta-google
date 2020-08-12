@@ -1,5 +1,4 @@
 const { Sequelize, DataTypes } = require("sequelize");
-const { db } = require("./index");
 module.exports = (sequelize, DataTypes) => {
   const consulta = sequelize.define("consulta", {
     id: {
@@ -12,10 +11,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       type: DataTypes.STRING,
     },
-    dataNascimento:{
-      type: DataTypes.DATE
+    dataNascimento: {
+      type: DataTypes.DATE,
     },
-    signo:{
+    signo: {
       type: DataTypes.STRING,
     },
 
