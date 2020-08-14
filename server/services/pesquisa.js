@@ -79,6 +79,7 @@ const getDateNascimentoGoogle = async (nome) => {
     url: `https://www.google.com/search?q=${nome}&rlz=1C1GCEU_pt-BRBR894BR894&ie=UTF-8`,
     method: "GET",
   }).then((res) => {
+    var html = res.data;
     let txt = html.match(/([jfajsondm]\w+\s\d+,\s\d+)[\s,]+/gim);
     var dataNascimento=undefined;
     var nomeGoogle = undefined;
@@ -127,9 +128,9 @@ const sanitize = (obj) => {
     ...obj, 
     nome:obj.nome
     .trim()
-    .replace(/\s+/gim, " ")
-    .replace(/[^\w\s\d]/gim, "")
     .toLowerCase()
+    .replace(/\s+/gim, " ")
+    .replace(/[^\w\s\dáéíóúâêîôûãõàèìòù]/gim, "")
   };
 };
 const pesquisa = async (_nome) => {
