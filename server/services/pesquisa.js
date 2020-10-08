@@ -118,16 +118,17 @@ const getPhotos = async (nome) => {
 
       return obj.data.items[0];
     } catch (error) {
-      return {link:"https://images.unsplash.com/photo-1519400197429-404ae1a1e184?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1586&q=80"  }    
+      return {
+        link:"https://images.unsplash.com/photo-1519400197429-404ae1a1e184?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1586&q=80",
+        error:error
+      }    
     }
 
 };
 
-const sanitize = (obj) => {
+const sanitize = (nome) => {
   return {
-    ...obj, 
-    nome:obj.nome
-    .trim()
+    nome:nome.trim()
     .toLowerCase()
     .replace(/\s+/gim, " ")
     .replace(/[^\w\s\dáéíóúâêîôûãõàèìòù]/gim, "")
@@ -141,7 +142,7 @@ const pesquisa = async (_nome) => {
     imagem:undefined,
   };
 
-  const nome = sanitize(resultado).nome;
+  const nome = sanitize(_nome).nome;
 
   let pesquisa = await db.consulta.findOne({ where: { nome: nome } });
   if (pesquisa) {

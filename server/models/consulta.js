@@ -24,9 +24,11 @@ module.exports = (sequelize, DataTypes) => {
 
     like: {
       type: DataTypes.INTEGER,
+      defaultValue:0
     },
     dislike: {
       type: DataTypes.INTEGER,
+      defaultValue:0
     },
   });
   return consulta;
