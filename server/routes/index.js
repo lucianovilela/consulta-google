@@ -1,48 +1,46 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
-var moment = require('moment');
-const pesquisa = require('../services/pesquisa'); 
-const like = require('../services/like'); 
-
+var moment = require("moment");
+const pesquisa = require("../services/pesquisa");
+const like = require("../services/like");
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { result:null });
+router.get("/", function (req, res, next) {
+  res.render("index", { result: null });
 });
 /* GET home page. */
-router.get('/signo', async function(req, res, next) {
-  let result=undefined;
-  if(req.query.nome){
-     result= await pesquisa(req.query.nome);
+router.get("/signo", async function (req, res, next) {
+  let result = undefined;
+  if (req.query.nome) {
+    result = await pesquisa(req.query.nome);
   }
-  if(result){
-    const dn =moment(result.dataNascimento).format("DD/MM/YYYY");
-    res.render('index', { title: 'Signos', dn, result });
-
-  }
-  else{
-    res.render('index', { title: 'Signos', result});
-
+  if (result) {
+    const dn = moment(result.dataNascimento).format("DD/MM/YYYY");
+    res.render("index", { title: "Signos", dn, result });
+  } else {
+    res.render("index", { title: "Signos", result });
   }
 });
 
-router.get('/celeb/:nome',  async function(req, res) {
-  res.json(await pesquisa(req.params.nome));
+router.get("/celeb", async function (req, res) {
+  if (req.query.nome) {
+    res.json(await pesquisa(req.query.nome));
+  }
 });
 
-router.put('/like', async (req, res)=>{
+router.put("/like", async (req, res) => {
   like(req.query.id, "like")
-  .then(result => res.json(result))
-  .catch(error =>{res.status(500).json(error)})
-
+    .then((result) => res.json(result))
+    .catch((error) => {
+      res.status(500).json(error);
+    });
 });
-router.put('/dislike', async (req, res)=>{
+router.put("/dislike", async (req, res) => {
   like(req.query.id, "like")
-  .then(result => res.json(result))
-  .catch(error =>{res.status(500).json({'error':error.message})})
-
-
+    .then((result) => res.json(result))
+    .catch((error) => {
+      res.status(500).json({ error: error.message });
+    });
 });
-
 
 module.exports = router;
