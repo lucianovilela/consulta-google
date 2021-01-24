@@ -4,6 +4,9 @@ var moment = require("moment");
 const pesquisa = require("../services/pesquisa");
 const like = require("../services/like");
 
+const db = require("../models/index");
+
+
 /* GET home page. */
 router.get("/", function (req, res, next) {
   res.render("index", { result: null });
@@ -26,6 +29,16 @@ router.get("/celeb", async function (req, res) {
   if (req.query.nome) {
     res.json(await pesquisa(req.query.nome));
   }
+});
+
+router.get("/list", async (req, res)=>{
+  db.consulta.findAndCountAll({
+    limit:10,
+    offset:(req.query.pg*10)||0,
+    order:['nome']
+  }).then((result)=>{
+    res.json(result);
+  });
 });
 
 router.put("/like", async (req, res) => {

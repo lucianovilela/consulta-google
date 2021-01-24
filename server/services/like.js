@@ -1,5 +1,4 @@
 
-const { Model } = require("sequelize");
 const db = require("../models/index");
 
 const  like=async (id, coluna)=>{
