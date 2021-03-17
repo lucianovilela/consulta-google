@@ -76,6 +76,7 @@ const getPhotos = async (nome) => {
 
     return obj.data.items[0];
   } catch (error) {
+      console.log(error);
     return {
       link:
         "https://images.unsplash.com/photo-1519400197429-404ae1a1e184?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1586&q=80",

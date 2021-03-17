@@ -5,6 +5,9 @@ const pesquisa = require("../services/pesquisa");
 const like = require("../services/like");
 
 const db = require("../models/index");
+const { google } = require("googleapis");
+
+const customsearch = google.customsearch("v1");
 
 
 /* GET home page. */
@@ -55,5 +58,20 @@ router.put("/dislike", async (req, res) => {
       res.status(500).json({ error: error.message });
     });
 });
+
+router.get("/teste", async (req, res)=>{
+    res.send( await customsearch.cse.list({
+      q: req.query.q,
+      cx: process.env.cx,
+      num: 10,
+      exactTerms : "nascimento",
+      safe: "off",
+      auth: process.env.developerKey,
+    }));
+
+
+
+});
+
 
 module.exports = router;
