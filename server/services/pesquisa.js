@@ -1,8 +1,6 @@
-const axios = require("axios").default;
-const { google } = require("googleapis");
-const customsearch = google.customsearch("v1");
 const moment = require("moment");
 const pretty = require("pretty");
+const wiki =require('wikijs').default;
 
 const db = require("../models/index");
 const SIGNOS = [
@@ -21,7 +19,9 @@ const SIGNOS = [
   { signo: "Capricórnio", meses: [1, 1], dias: [1, 19] },
 ];
 
-const getSigno = (dataNascimento) => {
+const getSigno = (dt) => {
+    const dataNascimento = moment(dt);
+    console.log("signo", dataNascimento);
   for (const o of SIGNOS) {
     dia = (dataNascimento.month() + 1) * 100 + dataNascimento.date();
     if (
@@ -33,57 +33,7 @@ const getSigno = (dataNascimento) => {
   }
 };
 
-const getDateNascimentoGoogle = async (nome) => {
-  return await axios({
-    url: `https://www.google.com/search?q=${nome}&ie=UTF-8`,
-    method: "GET",
-  }).then((res) => {
-    var html = res.data;
-    let txt = html.match(/([jfajsondm]\w+\s\d+,\s\d+)[\s,]+/gim);
-    var dataNascimento = undefined;
-    var nomeGoogle = undefined;
 
-    if (txt) {
-      dataNascimento = moment(txt[0], "MMMM DD YYYY", "en");
-    } else {
-      txt = html.match(/(\d{1,2}\sde\s[jfmajsond]\w+\sde\s\d{4})/gim);
-      if (txt) {
-        dataNascimento = moment(txt[0], "DD MMMM YYYY", "pt-br");
-      }
-    }
-
-    txt = html.match(/data\-attrid\=\"title\".+<span>([\w\s]+)<\/span>/gim);
-    if (txt) {
-      nomeGoogle = txt[0];
-    }
-
-    return { dataNascimento, nomeGoogle };
-  });
-};
-
-const getPhotos = async (nome) => {
-  try {
-    const obj = await customsearch.cse.list({
-      q: nome,
-      cx: process.env.cx,
-      searchType: "image",
-      num: 1,
-      imgType: "photo",
-      fileType: "png",
-      safe: "off",
-      auth: process.env.developerKey,
-    });
-
-    return obj.data.items[0];
-  } catch (error) {
-      console.log(error);
-    return {
-      link:
-        "https://images.unsplash.com/photo-1519400197429-404ae1a1e184?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1586&q=80",
-      error: error,
-    };
-  }
-};
 function retira_acentos(str) {
   let com_acento =
     "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝŔÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿŕ";
@@ -106,6 +56,8 @@ function retira_acentos(str) {
   }
   return novastr;
 }
+
+
 const sanitize = (nome) => {
   return retira_acentos(
       nome
@@ -114,34 +66,26 @@ const sanitize = (nome) => {
       .replace(/\s+/gim, " "));
 }
 
+const consultaWiki=async (nome)=>{
+     return( await wiki().find(nome)
+    .then(async page => ({'info':await page.info(), 'imagem':await page.mainImage()}) )
+    .catch(e=>JSON.stringify(e)));
+
+}
+
 
 const pesquisa = async (_nome) => {
 
   const nome = sanitize(_nome);
 
-  let pesquisa = await db.consulta.findOne({ where: { nome: nome } });
-  if (pesquisa) {
-    return pesquisa;
-  }
 
-  let { dataNascimento, nomeGoogle } = await getDateNascimentoGoogle(nome);
+  let resp = await consultaWiki(nome);
   try {
     var signo = undefined;
-    var photo = undefined;
-    if (!nomeGoogle) {
-      nomeGoogle = nome;
+    if (resp.info?.birthDate?.date) {
+      signo =  getSigno(new Date(resp.info?.birthDate?.date));
     }
-    if (dataNascimento) {
-      signo = await getSigno(dataNascimento);
-      photo = await getPhotos(nomeGoogle);
-    }
-    pesquisa = await db.consulta.create({
-      nome: nomeGoogle,
-      signo: signo.signo,
-      dataNascimento: dataNascimento,
-      imagem: photo.link,
-    });
-    return pesquisa;
+    return ( {...resp, signo} );
   } catch (error) {
     return { error: error.message };
   }
