@@ -64,14 +64,31 @@ router.get("/teste", async (req, res)=>{
       q: req.query.q,
       cx: process.env.cx,
       num: 10,
-      exactTerms : "nascimento",
       safe: "off",
       auth: process.env.developerKey,
-    }));
+      siteSearch:"wikipedia.com",
+      siteSearchFilter:"i"
+    })
+    .catch(e=>JSON.stringify(e)));
+
 
 
 
 });
+
+const wiki =require('wikijs').default;
+// const wiki = require('wikijs').default;
+
+
+
+router.get("/testeWiki", async (req, res)=>{
+    res.send( await wiki().find(req.query.q)
+    .then(async page => ({'info':await page.info(), 'imagem':await page.mainImage()}) )
+    .catch(e=>JSON.stringify(e)));
+
+});
+
+
 
 
 module.exports = router;
