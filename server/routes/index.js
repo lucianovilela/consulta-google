@@ -83,7 +83,7 @@ const wiki =require('wikijs').default;
 
 router.get("/testeWiki", async (req, res)=>{
     res.send( await wiki().find(req.query.q)
-    .then(async page => ({'info':await page.info(), 'imagem':await page.mainImage()}) )
+    .then(async page => ({...page, 'imagem':await page.mainImage()}) )
     .catch(e=>JSON.stringify(e)));
 
 });

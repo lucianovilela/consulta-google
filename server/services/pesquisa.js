@@ -68,7 +68,7 @@ const sanitize = (nome) => {
 
 const consultaWiki=async (nome)=>{
      return( await wiki().find(nome)
-    .then(async page => ({'info':await page.info(), 'imagem':await page.mainImage()}) )
+    .then(async page => ({'info':await page.info(), 'imagem':await page.mainImage(), 'url':page.url()}) )
     .catch(e=>JSON.stringify(e)));
 
 }
